@@ -1,0 +1,54 @@
+generator client { provider = "prisma-client-js" }
+
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+
+enum PaymentKind { LEASE SWAP_FEE }
+enum PaymentStatus { PENDING PAID FAILED }
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  phone     String?
+  role      String   @default("TRAVELER")
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  bookings  Booking[]
+}
+
+model Vehicle {
+  id        String   @id @default(cuid())
+  ownerId   String
+  title     String
+  city      String
+  selfDrivePricePerDay   Int
+  chauffeuredPricePerDay Int
+  createdAt DateTime @default(now())
+}
+
+model Booking {
+  id            String   @id @default(cuid())
+  vehicleId     String
+  renterId      String
+  startDate     DateTime
+  endDate       DateTime
+  arrivalAt     DateTime
+  driveMode     String
+  totalPrice    Int
+  paymentStatus PaymentStatus @default(PENDING)
+  createdAt     DateTime @default(now())
+  payment       Payment?
+}
+
+model Payment {
+  id                  String   @id @default(cuid())
+  kind                PaymentKind
+  status              PaymentStatus @default(PENDING)
+  amount              Int
+  currency            String   @default("KES")
+  pesapalTrackingId   String?
+  pesapalMerchantRef  String?
+  bookingId           String?
+  createdAt           DateTime @default(now())
+}

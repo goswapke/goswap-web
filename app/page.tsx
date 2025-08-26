@@ -1,14 +1,14 @@
 export default function Home() {
   return (
-    <main style={{maxWidth: 960, margin: "0 auto", padding: 24}}>
-      <h1>GoSwap</h1>
-      <p>Lease a vehicle or swap cars. Marketplace model — partners list cars, travelers book; swappers list and match.</p>
-      <nav style={{display:"flex", gap:12, marginTop:16}}>
-        <a href="/auth/register">Create account</a>
-        <a href="/auth/sign-in">Sign in</a>
-        <a href="/lease">Lease</a>
-        <a href="/swap">Swap</a>
-      </nav>
-    </main>
+    <section style={{ textAlign: "center", padding: "64px 0" }}>
+      <h1 style={{ fontSize: 44, lineHeight: 1.1, marginBottom: 12 }}>Lease or Swap a Car with Ease</h1>
+      <p style={{ color: "#555", maxWidth: 720, margin: "0 auto 28px" }}>
+        GoSwap lets travelers lease a car at their destination or match a car swap across Kenyan corridors. Simple, transparent, and flexible.
+      </p>
+      <div style={{ display: "flex", gap: 16, justifyContent: "center" }}>
+        <a href="/lease" style={{ padding: "12px 18px", background: "#111", color: "#fff", textDecoration: "none", borderRadius: 8 }}>Start Leasing</a>
+        <a href="/swap" style={{ padding: "12px 18px", border: "1px solid #111", color: "#111", textDecoration: "none", borderRadius: 8 }}>List a Swap</a>
+      </div>
+    </section>
   );
 }

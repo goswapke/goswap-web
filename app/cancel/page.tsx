@@ -1,3 +1,3 @@
-export default function Cancel(){
-  return (<div style={{textAlign:"center"}}><h2>Payment canceled</h2><p>You can retry from your dashboard or the vehicle page.</p></div>);
+export default function Cancel() {
+  return <div style={{ padding: 24 }}><h2>Cancelled</h2><p>You cancelled the process.</p></div>;
 }

@@ -60,12 +60,12 @@ model Booking {
 }
 
 model Payment {
-  id        String   @id @default(cuid())
-  kind      String   // LEASE | SWAP_FEE
-  status    String   @default("PENDING") // PENDING | PAID | FAILED
+  id        String    @id @default(cuid())
+  kind      String    // LEASE | SWAP_FEE
+  status    String    @default("PENDING") // PENDING | PAID | FAILED
   amount    Int
-  currency  String   @default("KES")
+  currency  String    @default("KES")
   meta      Json?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
+  bookings  Booking[] // <-- back relation so Prisma understands the link
 }
-

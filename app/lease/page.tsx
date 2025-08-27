@@ -1,37 +1,28 @@
-"use client";
-import { useState } from "react";
+import { vehicles } from "@/lib/sampleData";
 
-export default function Lease() {
-  const [amount, setAmount] = useState("1000");
-  const [msg, setMsg] = useState<string | null>(null);
+export const dynamic = "force-dynamic";
 
-  async function pay() {
-    setMsg(null);
-    try {
-      const res = await fetch("/api/pesapal/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: Number(amount), description: "GoSwap Lease" })
-      });
-      const j = await res.json();
-      if (!res.ok || !j.redirect_url) throw new Error(j.error || "Order error");
-      window.location.href = j.redirect_url; // redirect to Pesapal
-    } catch (e: any) {
-      setMsg(e.message || "Payment failed");
-    }
-  }
+export default async function LeasePage() {
+  const items = vehicles.filter(v => v.category === "LEASE");
 
   return (
-    <div style={{ maxWidth: 520, margin: "32px auto" }}>
-      <h2>Lease a vehicle</h2>
-      <p style={{ color: "#555" }}>Demo: enter an amount and click Pay to open Pesapal checkout.</p>
-      <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-        <input value={amount} onChange={e => setAmount(e.target.value)} style={{ flex: 1 }} />
-        <button onClick={pay} style={{ padding: "10px 14px", background: "#111", color: "#fff", border: 0, borderRadius: 8 }}>
-          Pay via Pesapal
-        </button>
+    <section>
+      <h1 className="text-2xl font-semibold mb-4">Lease vehicles</h1>
+      <p className="text-sm text-slate-600 mb-6">Filter by city and pickup at checkout (demo data for now).</p>
+      <div className="grid md:grid-cols-3 gap-4">
+        {items.map(v => (
+          <div key={v.id} className="border rounded-lg p-4">
+            <div className="font-medium">{v.title} — {v.city}</div>
+            <div className="text-xs text-slate-600">{v.make} {v.model} • {v.year} • Pickup: {v.pickupType.replace("_"," ")}</div>
+            <div className="mt-2 text-sm">
+              Self-drive: KES {v.selfDrivePerDay?.toLocaleString()}/day<br/>
+              Chauffeured: KES {v.chauffeuredPerDay?.toLocaleString()}/day
+            </div>
+            <p className="mt-2 text-sm text-slate-700">{v.description}</p>
+            <a href="/auth/signin" className="mt-3 inline-block text-sm rounded px-3 py-1 border">Book</a>
+          </div>
+        ))}
       </div>
-      {msg && <div style={{ color: "crimson", marginTop: 10 }}>{msg}</div>}
-    </div>
+    </section>
   );
 }

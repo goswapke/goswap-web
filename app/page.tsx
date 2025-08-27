@@ -1,11 +1,20 @@
+// app/page.tsx
 export default function Home() {
   return (
-    <section className="hero">
-      <h1>Freedom to move, anywhere</h1>
-      <p>GoSwap lets travelers lease a car from trusted partners or swap vehicles with matching travelers—reducing hassle, fatigue, and cost while staying flexible.</p>
-      <div style={{ display: "flex", gap: 12 }}>
-        <a href="/lease" className="btn btn-primary">Find a car to lease</a>
-        <a href="/swap" className="btn btn-outline">Explore swaps</a>
+    <section style={{ display: "grid", gap: 16 }}>
+      <div style={{ padding: "48px 0", textAlign: "center" }}>
+        <h1 style={{ fontSize: 36, marginBottom: 8 }}>Smarter car access for your trip</h1>
+        <p style={{ fontSize: 16, color: "#555", marginBottom: 24 }}>
+          Lease a vehicle at destination or swap with someone whose car fits your route—cut costs, stay flexible.
+        </p>
+        <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+          <a href="/lease" style={{ padding: "12px 16px", background: "#111", color: "#fff", borderRadius: 8, textDecoration: "none" }}>Start Leasing</a>
+          <a href="/swap" style={{ padding: "12px 16px", background: "#f3f3f3", color: "#111", borderRadius: 8, textDecoration: "none" }}>List a Swap</a>
+        </div>
+      </div>
+      <div style={{ display: "grid", gap: 8, textAlign: "center", color: "#666" }}>
+        <span>Active cities: Nairobi • Mombasa • Kisumu</span>
+        <span>Pickup: SGR • Airport • City Center · Modes: Self-drive or Chauffeured</span>
       </div>
     </section>
   );

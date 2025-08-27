@@ -1,32 +1,27 @@
-import "./globals.css";
-
-export const metadata = {
-  title: "GoSwap",
-  description: "Lease or swap cars across Kenya",
-};
+// app/layout.tsx
+export const metadata = { title: "GoSwap", description: "Travel mobility marketplace" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        <header>
-          <div className="container nav">
-            <a href="/" style={{ fontWeight: 700 }}>GoSwap</a>
-            <nav>
+      <body style={{ fontFamily: "system-ui, Arial, sans-serif", margin: 0 }}>
+        <header style={{ borderBottom: "1px solid #eee" }}>
+          <nav style={{ maxWidth: 1100, margin: "0 auto", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <a href="/" style={{ fontWeight: 700, textDecoration: "none", color: "#111" }}>GoSwap</a>
+            <div style={{ display: "flex", gap: 12 }}>
               <a href="/lease">Lease</a>
               <a href="/swap">Swap</a>
               <a href="/auth/signin">Sign in</a>
-              <a href="/auth/signup" className="btn btn-outline" style={{ marginLeft: 8 }}>Create account</a>
-            </nav>
-          </div>
+            </div>
+          </nav>
         </header>
-        <main className="container">{children}</main>
-        <footer className="footer">
-          <div className="container">© {new Date().getFullYear()} GoSwap • Travel mobility marketplace</div>
+        <main style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 16px" }}>{children}</main>
+        <footer style={{ borderTop: "1px solid #eee", marginTop: 40 }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 16px", fontSize: 13, color: "#666" }}>
+            © {new Date().getFullYear()} GoSwap • Nairobi • <a href="/success">Success</a> • <a href="/cancel">Cancel</a>
+          </div>
         </footer>
       </body>
     </html>
   );
 }
-
-  

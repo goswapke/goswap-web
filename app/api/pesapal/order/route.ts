@@ -13,9 +13,9 @@ async function getToken(base: string, key: string, secret: string) {
 }
 
 export async function POST(req: Request) {
-  const base = process.env.PESAPAL_BASE_URL;
-  const key = process.env.PESAPAL_CONSUMER_KEY;
-  const secret = process.env.PESAPAL_CONSUMER_SECRET;
+  const base = process.env.PESAPAL_BASE_URL;https://pay.pesapal.com
+  const key = process.env.PESAPAL_CONSUMER_KEY;s28ixm3IpQcLZ8WPvEipxADr4GftuTWv
+  const secret = process.env.PESAPAL_CONSUMER_SECRET;s4PckQMNQvi0lgVWAUmZ0gyAUAw=
   const callback = process.env.PESAPAL_CALLBACK_URL;
   const notificationId = process.env.PESAPAL_IPN_ID || "";
 

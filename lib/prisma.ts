@@ -9,10 +9,7 @@ export const prisma =
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   });
 
-// cache client in dev to avoid creating many instances on hot reload
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
-// ✅ Export both named and default so either import style works:
-// import { prisma } from "@/lib/prisma"
-// import prisma from "@/lib/prisma"
+// Export both named and default so any import style works
 export default prisma;

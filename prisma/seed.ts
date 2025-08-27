@@ -1,7 +1,25 @@
 // prisma/seed.ts
 import { prisma } from "../lib/prisma";
+import { hash } from "bcryptjs";
 
 async function main() {
+  // --- Seed a test user (for login) ---
+  const email = "admin@goswap.co.ke";
+  const passwordPlain = "goswap123"; // change later in production
+  const passwordHash = await hash(passwordPlain, 10);
+
+  await prisma.user.upsert({
+    where: { email },
+    update: {},
+    create: {
+      email,
+      password: passwordHash,
+      name: "GoSwap Admin",
+      role: "admin",
+    },
+  });
+
+  // --- Seed vehicles (swap) ---
   const vehicles = [
     {
       make: "Toyota", model: "RAV4", year: 2019, fuelType: "Petrol", transmission: "Automatic",
@@ -49,15 +67,13 @@ async function main() {
     });
   }
 
-  return "✅ Seeded swap vehicles";
+  return "✅ Seeded 1 user and swap vehicles";
 }
 
 export default main;
 
 if (require.main === module) {
-  main().then(msg => { console.log(msg); process.exit(0); })
-       .catch(err => { console.error(err); process.exit(1); });
+  main()
+    .then(msg => { console.log(msg); process.exit(0); })
+    .catch(err => { console.error(err); process.exit(1); });
 }
-
-   
-

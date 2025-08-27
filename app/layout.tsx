@@ -1,25 +1,27 @@
-export const metadata = { title: "GoSwap", description: "Travel mobility marketplace" };
+export const metadata = { title: "GoSwap", description: "Lease or swap cars across Kenya" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body style={{ margin: 0, fontFamily: "system-ui, sans-serif" }}>
-        <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 20px", borderBottom: "1px solid #eee" }}>
-          <a href="/" style={{ fontWeight: 700, textDecoration: "none", color: "#111" }}>GoSwap</a>
-          <nav style={{ display: "flex", gap: 14 }}>
-            <a href="/lease">Lease</a>
-            <a href="/swap">Swap</a>
-            <a href="/auth/sign-in">Sign in</a>
-            <a href="/auth/register" style={{ fontWeight: 600 }}>Create account</a>
+      <body className="min-h-screen bg-white text-slate-900">
+        <header className="border-b">
+          <nav className="mx-auto max-w-6xl flex items-center justify-between p-4">
+            <a href="/" className="font-bold text-lg">GoSwap</a>
+            <div className="flex items-center gap-4 text-sm">
+              <a href="/lease" className="hover:underline">Lease</a>
+              <a href="/swap" className="hover:underline">Swap</a>
+              <a href="/auth/signin" className="hover:underline">Sign in</a>
+              <a href="/auth/signup" className="rounded px-3 py-1 border hover:bg-slate-50">Create account</a>
+            </div>
           </nav>
         </header>
-        <main style={{ maxWidth: 1100, margin: "0 auto", padding: 24 }}>{children}</main>
-        <footer style={{ borderTop: "1px solid #eee", marginTop: 40, padding: 16, fontSize: 12, color: "#666" }}>
-          © {new Date().getFullYear()} GoSwap
+        <main className="mx-auto max-w-6xl p-6">{children}</main>
+        <footer className="mt-16 border-t">
+          <div className="mx-auto max-w-6xl p-6 text-xs text-slate-500">
+            © {new Date().getFullYear()} GoSwap • Travel mobility marketplace
+          </div>
         </footer>
       </body>
     </html>
   );
 }
-
-

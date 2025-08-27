@@ -13,6 +13,16 @@ enum ListingType {
   SWAP
 }
 
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("traveler")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Vehicle {
   id            String      @id @default(cuid())
   make          String

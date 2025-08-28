@@ -1,73 +1,91 @@
 // app/swap/page.tsx
 export const runtime = "nodejs";
+export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
-import Link from "next/link";
 import prisma from "@/lib/prisma";
 
-async function ensureSeed() {
-  if (process.env.AUTO_SEED !== "true") return;
-  const count = await prisma.vehicle.count({ where: { listingType: "SWAP" } });
-  if (count > 0) return;
-
-  const vehicles = [
-    { make:"Toyota", model:"RAV4", year:2019, fuelType:"Petrol", transmission:"Automatic", locationCity:"Nairobi", imageUrl:"https://images.unsplash.com/photo-1619767886558-efdc259cde1a", description:"Clean SUV, ideal for city and weekend trips.", listingType:"SWAP" as const },
-    { make:"Mazda", model:"CX-5", year:2020, fuelType:"Petrol", transmission:"Automatic", locationCity:"Mombasa", imageUrl:"https://images.unsplash.com/photo-1549921296-3b4a3d4b8b36", description:"Comfortable coastal cruiser, well maintained.", listingType:"SWAP" as const },
-    { make:"Subaru", model:"Forester", year:2018, fuelType:"Petrol", transmission:"Automatic", locationCity:"Kisumu", imageUrl:"https://images.unsplash.com/photo-1583121274602-3e2820f36e55", description:"All-wheel drive, great for trips around the lake.", listingType:"SWAP" as const },
-    { make:"Nissan", model:"X-Trail", year:2017, fuelType:"Diesel", transmission:"Automatic", locationCity:"Nairobi", imageUrl:"https://images.unsplash.com/photo-1605559424843-9e4f1a5b4f9c", description:"Spacious family SUV with good ground clearance.", listingType:"SWAP" as const },
-    { make:"Honda", model:"CR-V", year:2019, fuelType:"Petrol", transmission:"Automatic", locationCity:"Mombasa", imageUrl:"https://images.unsplash.com/photo-1503376780353-7e6692767b70", description:"Reliable and efficient; perfect for coastal drives.", listingType:"SWAP" as const },
-  ];
-
-  for (const v of vehicles) {
-    const id = `${v.make}_${v.model}_${v.year}_${v.locationCity}`.toLowerCase().replace(/\s+/g, "-");
-    await prisma.vehicle.upsert({ where: { id }, update: v, create: { ...v, id } });
-  }
-}
+type CardVehicle = {
+  id: string;
+  make: string;
+  model: string;
+  year: number;
+  locationCity: string;
+  imageUrl: string | null;
+};
 
 export default async function SwapPage() {
-  await ensureSeed(); // seeds once if empty and AUTO_SEED=true
-
-  const swapVehicles = await prisma.vehicle.findMany({
-    where: { listingType: "SWAP" },
-    orderBy: { createdAt: "desc" },
-  });
-
-  if (swapVehicles.length === 0) {
-    return (
-      <main className="max-w-6xl mx-auto px-4 py-10">
-        <h1 className="text-2xl md:text-3xl font-semibold mb-3">Swap Vehicles</h1>
-        <p className="text-gray-600">No vehicles yet. Try seeding, then reload this page.</p>
-      </main>
-    );
+  let vehicles: CardVehicle[] = [];
+  try {
+    vehicles = await prisma.vehicle.findMany({
+      where: { listingType: "SWAP", status: "APPROVED" },
+      orderBy: { createdAt: "desc" },
+      take: 60,
+      select: {
+        id: true,
+        make: true,
+        model: true,
+        year: true,
+        locationCity: true,
+        imageUrl: true,
+      },
+    });
+  } catch (e) {
+    // If DB is unreachable, keep the page functional with an empty list
+    vehicles = [];
   }
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-10">
-      <header className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-semibold">Swap Vehicles</h1>
-        <p className="text-sm text-gray-500">Browse all vehicles available for swap.</p>
-      </header>
+    <main className="page-wrap">
+      <h1 className="section-title">Vehicles available for Swap</h1>
+      <p className="section-subtle">
+        Browse currently available swap vehicles. Start a match and we’ll help you connect with partners.
+      </p>
 
-      <section aria-label="Vehicles available for swap">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {swapVehicles.map((v) => (
-            <article key={v.id} className="rounded-2xl border border-gray-200/40 bg-white/90 shadow-sm p-4">
-              {v.imageUrl && (
-                <img src={v.imageUrl} alt={`${v.make} ${v.model}`} className="w-full h-40 object-cover rounded-xl mb-3" />
-              )}
-              <h2 className="text-lg font-medium">{v.year} {v.make} {v.model}</h2>
-              <p className="text-sm text-gray-600">{v.locationCity}</p>
-              {v.description && <p className="text-sm text-gray-500 mt-1">{v.description}</p>}
-            </article>
-          ))}
+      {vehicles.length > 0 ? (
+        <>
+          <div className="grid md:grid-cols-3 gap-4 mt-6">
+            {vehicles.map((v) => (
+              <div key={v.id} className="card overflow-hidden">
+                <div className="w-full h-40 bg-slate-100">
+                  {/* use plain <img> to avoid extra Next setup */}
+                  <img
+                    src={
+                      v.imageUrl ||
+                      "https://images.unsplash.com/photo-1493238792000-8113da705763?q=80&w=1200&auto=format&fit=crop"
+                    }
+                    alt={`${v.year} ${v.make} ${v.model}`}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="p-4">
+                  <div className="text-base font-medium">
+                    {v.year} {v.make} {v.model}
+                  </div>
+                  <div className="text-sm text-slate-600 mt-1">{v.locationCity}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Button BELOW the list */}
+          <div className="mt-10 flex justify-center">
+            <a href="/swap/match" className="btn-primary">Match for Swap</a>
+          </div>
+        </>
+      ) : (
+        // Empty state (still shows the button)
+        <div className="card p-8 mt-6 text-center">
+          <h3 className="text-lg font-medium">No swap vehicles yet</h3>
+          <p className="text-slate-600 mt-2">
+            We’re onboarding partners and adding inventory. You can still start a match now.
+          </p>
+          <div className="mt-6">
+            <a href="/swap/match" className="btn-primary">Match for Swap</a>
+          </div>
         </div>
-      </section>
-
-      <div className="mt-8 flex justify-center">
-        <Link href="/swap/match" className="inline-flex items-center justify-center rounded-2xl px-5 py-3 text-base font-medium border border-gray-300 hover:border-gray-400 transition shadow-sm">
-          Match for Swap
-        </Link>
-      </div>
+      )}
     </main>
   );
 }

@@ -2,31 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== Light Theme Tokens (HSL) ===== */
+/* ===== Light Warm-Grey Theme (HSL) ===== */
 :root {
   /* Base */
-  --background: 0 0% 99%;        /* page background */
-  --foreground: 222 22% 12%;     /* main text */
-  --card: 0 0% 100%;             /* card surfaces */
-  --muted: 219 14% 42%;          /* secondary text */
-  --border: 220 16% 90%;         /* subtle borders */
+  --background: 30 10% 96%;       /* warm grey page background */
+  --foreground: 222 22% 12%;      /* main text */
+  --card: 0 0% 100%;              /* surfaces */
+  --muted: 219 14% 42%;           /* secondary text */
+  --border: 220 16% 90%;          /* subtle borders */
 
   /* Brand accents */
-  --brand: 248 63% 52%;          /* Indigo */
+  --brand: 248 63% 52%;           /* Indigo */
   --brand-foreground: 0 0% 100%;
-  --accent: 168 76% 40%;         /* Teal */
+  --accent: 168 76% 40%;          /* Teal */
+
+  /* Navy tints for hero */
+  --navy-1: 226 65% 22%;
+  --navy-2: 224 70% 28%;
 
   /* Shadow base */
   --shadow: 220 30% 20%;
 }
 
-/* Subtle light background (very soft gradient/noise) */
+/* Soft warm-grey background */
 html, body { height: 100%; }
 body {
   color: hsl(var(--foreground));
   background:
-    radial-gradient(900px 450px at 20% -10%, hsl(248 63% 96%), transparent 60%),
-    radial-gradient(1000px 600px at 100% 0%, hsl(168 76% 95%), transparent 60%),
+    radial-gradient(900px 450px at 25% -10%, hsl(248 63% 96%), transparent 60%),
+    radial-gradient(900px 600px at 110% -5%, hsl(30 30% 96%), transparent 60%),
     linear-gradient(180deg, hsl(0 0% 100%), hsl(var(--background)));
 }
 
@@ -35,9 +39,10 @@ body {
   .page-wrap { @apply max-w-6xl mx-auto px-4 py-10; }
 
   .card {
-    @apply rounded-2xl border shadow-soft;
+    @apply rounded-2xl border;
     background-color: hsl(var(--card));
     border-color: hsl(var(--border));
+    box-shadow: 0 10px 30px -12px hsl(var(--shadow)/0.12);
   }
 
   .btn { @apply inline-flex items-center justify-center rounded-2xl px-5 py-3 font-medium transition; }
@@ -64,9 +69,21 @@ body {
 
   .section-title { @apply text-2xl md:text-3xl font-semibold mb-2; }
   .section-subtle { @apply text-sm text-gray-600; }
-}
 
-/* Softer shadows for light UI */
-@layer utilities {
-  .shadow-soft { box-shadow: 0 10px 30px -12px hsl(var(--shadow)/0.15); }
-  .shadow-
+  /* === Subtle Navy Hero === */
+  .hero-shell {
+    @apply relative overflow-hidden rounded-[28px] border;
+    border-color: hsl(var(--border));
+    background:
+      radial-gradient(1200px 480px at 70% -200px, hsl(var(--navy-2) / 0.30), transparent 60%),
+      radial-gradient(900px 360px at -150px -120px, hsl(var(--navy-1) / 0.22), transparent 60%),
+      linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 100%));
+  }
+  .hero-ring {
+    /* faint ring accent */
+    position: absolute; inset: -40%;
+    background: radial-gradient(closest-side, hsl(var(--brand) / 0.14), transparent 60%);
+    transform: rotate(8deg);
+    pointer-events: none;
+  }
+}

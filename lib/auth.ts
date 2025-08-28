@@ -3,7 +3,7 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { z } from "zod";
 
-/** ───────────────────────── Zod validation ───────────────────────── */
+/* ─────────────── Zod validation ─────────────── */
 export const signInSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
@@ -26,7 +26,7 @@ export function parseSignUp(raw: unknown): SignUpInput | null {
   return p.success ? p.data : null;
 }
 
-/** ───────────────────────── Session (JWT cookie) ───────────────────────── */
+/* ─────────────── Session (JWT in httpOnly cookie) ─────────────── */
 const COOKIE = "gs_session";
 const ALG = "HS256";
 
@@ -79,7 +79,7 @@ export function clearSession() {
   });
 }
 
-/** ───────────────────────── Role → portal helper ───────────────────────── */
+/* ─────────────── Role → portal route helper ─────────────── */
 export function portalFor(role: Session["role"]) {
   if (role === "PARTNER") return "/partner";
   if (role === "ADMIN") return "/admin";

@@ -24,6 +24,11 @@ export default function AdminPage() {
     (async () => {
       try {
         const res = await fetch("/api/admin/summary", { cache: "no-store" });
+        if (res.status === 401) {
+          // Not an admin or not signed in → go to sign-in, then return here
+          window.location.href = "/auth/sign-in?next=/admin";
+          return;
+        }
         const json = await res.json();
         if (!json.ok) throw new Error(json.error || "Failed");
         setUsers(json.users || []);
@@ -37,8 +42,9 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-10">
-      <h1 className="text-2xl md:text-3xl font-semibold mb-6">Admin</h1>
+    <main className="page-wrap">
+      <h1 className="section-title">Admin</h1>
+      <p className="section-subtle mb-6">Overview of users and vehicles (private, admin-only).</p>
 
       {loading && <p>Loading…</p>}
       {err && <p className="text-red-600">Error: {err}</p>}
@@ -47,55 +53,63 @@ export default function AdminPage() {
         <>
           <section className="mb-10">
             <h2 className="text-xl font-medium mb-3">Users</h2>
-            <div className="overflow-x-auto rounded-2xl border border-gray-200">
-              <table className="min-w-full text-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="text-left p-3">Email</th>
-                    <th className="text-left p-3">Role</th>
-                    <th className="text-left p-3">ID</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((u) => (
-                    <tr key={u.id} className="border-t">
-                      <td className="p-3">{u.email}</td>
-                      <td className="p-3">{u.role}</td>
-                      <td className="p-3">{u.id}</td>
+            <div className="card p-0 overflow-x-auto">
+              {users.length === 0 ? (
+                <div className="p-4 text-sm text-gray-600">No users yet.</div>
+              ) : (
+                <table className="min-w-full text-sm">
+                  <thead className="bg-white">
+                    <tr>
+                      <th className="text-left p-3">Email</th>
+                      <th className="text-left p-3">Role</th>
+                      <th className="text-left p-3">ID</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {users.map((u) => (
+                      <tr key={u.id} className="border-t" style={{ borderColor: "hsl(var(--border))" }}>
+                        <td className="p-3">{u.email}</td>
+                        <td className="p-3">{u.role}</td>
+                        <td className="p-3">{u.id}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </section>
 
           <section>
             <h2 className="text-xl font-medium mb-3">Vehicles</h2>
-            <div className="overflow-x-auto rounded-2xl border border-gray-200">
-              <table className="min-w-full text-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="text-left p-3">Year</th>
-                    <th className="text-left p-3">Make</th>
-                    <th className="text-left p-3">Model</th>
-                    <th className="text-left p-3">City</th>
-                    <th className="text-left p-3">Type</th>
-                    <th className="text-left p-3">ID</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {vehicles.map((v) => (
-                    <tr key={v.id} className="border-t">
-                      <td className="p-3">{v.year}</td>
-                      <td className="p-3">{v.make}</td>
-                      <td className="p-3">{v.model}</td>
-                      <td className="p-3">{v.locationCity}</td>
-                      <td className="p-3">{v.listingType}</td>
-                      <td className="p-3">{v.id}</td>
+            <div className="card p-0 overflow-x-auto">
+              {vehicles.length === 0 ? (
+                <div className="p-4 text-sm text-gray-600">No vehicles yet.</div>
+              ) : (
+                <table className="min-w-full text-sm">
+                  <thead className="bg-white">
+                    <tr>
+                      <th className="text-left p-3">Year</th>
+                      <th className="text-left p-3">Make</th>
+                      <th className="text-left p-3">Model</th>
+                      <th className="text-left p-3">City</th>
+                      <th className="text-left p-3">Type</th>
+                      <th className="text-left p-3">ID</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {vehicles.map((v) => (
+                      <tr key={v.id} className="border-t" style={{ borderColor: "hsl(var(--border))" }}>
+                        <td className="p-3">{v.year}</td>
+                        <td className="p-3">{v.make}</td>
+                        <td className="p-3">{v.model}</td>
+                        <td className="p-3">{v.locationCity}</td>
+                        <td className="p-3">{v.listingType}</td>
+                        <td className="p-3">{v.id}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </section>
         </>

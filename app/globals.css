@@ -2,32 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== Design Tokens (HSL) ===== */
+/* ===== Light Theme Tokens (HSL) ===== */
 :root {
-  /* Elegant dark navy theme */
-  --background: 222 36% 6%;
-  --foreground: 220 15% 96%;
-  --card: 222 32% 10%;
-  --muted: 220 9% 60%;
-  --border: 220 12% 20%;
+  /* Base */
+  --background: 0 0% 99%;        /* page background */
+  --foreground: 222 22% 12%;     /* main text */
+  --card: 0 0% 100%;             /* card surfaces */
+  --muted: 219 14% 42%;          /* secondary text */
+  --border: 220 16% 90%;         /* subtle borders */
 
   /* Brand accents */
-  --brand: 248 65% 63%;
+  --brand: 248 63% 52%;          /* Indigo */
   --brand-foreground: 0 0% 100%;
-  --accent: 168 82% 46%;
+  --accent: 168 76% 40%;         /* Teal */
 
   /* Shadow base */
-  --shadow: 220 40% 2%;
+  --shadow: 220 30% 20%;
 }
 
-/* Page background gradient */
+/* Subtle light background (very soft gradient/noise) */
 html, body { height: 100%; }
 body {
   color: hsl(var(--foreground));
   background:
-    radial-gradient(1200px 600px at 70% -100px, hsl(248 65% 15% / 0.60), transparent),
-    radial-gradient(800px 400px at -200px 20%, hsl(168 82% 20% / 0.35), transparent),
-    linear-gradient(180deg, hsl(222 35% 8%), hsl(222 35% 6%));
+    radial-gradient(900px 450px at 20% -10%, hsl(248 63% 96%), transparent 60%),
+    radial-gradient(1000px 600px at 100% 0%, hsl(168 76% 95%), transparent 60%),
+    linear-gradient(180deg, hsl(0 0% 100%), hsl(var(--background)));
 }
 
 /* ===== Reusable UI Primitives ===== */
@@ -53,15 +53,20 @@ body {
     border-color: hsl(var(--border));
     color: hsl(var(--foreground));
   }
-  .btn-ghost:hover { background-color: hsl(var(--card)); }
+  .btn-ghost:hover { background-color: hsl(0 0% 98%); }
 
   .chip {
     @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs border;
-    background-color: hsl(var(--brand) / 0.12);
+    background-color: hsl(var(--brand) / 0.10);
     border-color: hsl(var(--border));
     color: hsl(var(--brand));
   }
 
   .section-title { @apply text-2xl md:text-3xl font-semibold mb-2; }
-  .section-subtle { @apply text-sm text-gray-400; }
+  .section-subtle { @apply text-sm text-gray-600; }
 }
+
+/* Softer shadows for light UI */
+@layer utilities {
+  .shadow-soft { box-shadow: 0 10px 30px -12px hsl(var(--shadow)/0.15); }
+  .shadow-

@@ -2,34 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Theme tokens */
 :root{
   --bg: 0 0% 98%;
   --fg: 222 47% 11%;
-  --muted: 215 16% 47%;
   --border: 214 32% 91%;
-  --card: 0 0% 100%;
   --navy: 214 60% 22%;
   --navy-soft: 214 65% 96%;
 }
-
 html,body{background:hsl(var(--bg));color:hsl(var(--fg));}
-
-/* Helpers */
 .container{ @apply max-w-6xl mx-auto px-4; }
 .page-wrap{ @apply container py-10; }
-.section-title{ @apply text-2xl md:text-3xl font-semibold mb-2; }
-.section-subtle{ @apply text-sm text-slate-600; }
-.card{ background:hsl(var(--card)); border:1px solid hsl(var(--border)); border-radius:1rem; box-shadow:0 1px 1px rgba(0,0,0,.02); }
-
-/* Buttons */
-.btn,button,[role="button"],input[type="button"],input[type="submit"]{
-  @apply inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium transition;
-}
-.btn-primary{ background:hsl(var(--navy)); color:white; }
-.btn-primary:hover{ filter:brightness(1.05); }
-.btn-secondary{ @apply border; border-color:hsl(var(--border)); color:hsl(var(--fg)); background:white; }
-.btn-secondary:hover{ background:#f8fafc; }
-
-/* Links */
+.card{ background:#fff; border:1px solid hsl(var(--border)); border-radius:1rem; }
+.btn,button{ @apply inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium; }
+.btn-primary{ background:hsl(var(--navy)); color:#fff; }
+.btn-secondary{ @apply border; border-color:hsl(var(--border)); background:#fff; }
 .link{ @apply text-sm text-slate-700 hover:text-slate-900 underline-offset-4 hover:underline; }

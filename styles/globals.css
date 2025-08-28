@@ -5,7 +5,7 @@
 
 /* Theme tokens */
 :root {
-  --bg: 0 0% 98%;              /* warm gray background via Tailwind hsl() */
+  --bg: 0 0% 98%;              /* warm gray background */
   --fg: 222 47% 11%;           /* slate-900 */
   --muted: 215 16% 47%;        /* slate-500 */
   --border: 214 32% 91%;       /* slate-200 */
@@ -27,7 +27,7 @@ html, body {
 .card {
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
-  border-radius: 1rem; /* 2xl feel */
+  border-radius: 1rem;
   box-shadow: 0 1px 1px rgba(0,0,0,.02);
 }
 

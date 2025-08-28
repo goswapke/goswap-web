@@ -31,22 +31,31 @@ html, body {
   box-shadow: 0 1px 1px rgba(0,0,0,.02);
 }
 
-/* Buttons & links */
+/* Buttons: make everything with .btn (or native button) consistent */
+.btn,
+button,
+[role="button"],
+input[type="button"],
+input[type="submit"] {
+  @apply inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium transition;
+}
+
+/* Primary & Secondary variants */
 .btn-primary {
-  @apply inline-flex items-center rounded-xl px-3 py-2 text-sm font-medium;
   background: hsl(var(--navy));
   color: white;
 }
 .btn-primary:hover { filter: brightness(1.05); }
 
 .btn-secondary {
-  @apply inline-flex items-center rounded-xl px-3 py-2 text-sm font-medium border;
+  @apply border;
   border-color: hsl(var(--border));
   color: hsl(var(--fg));
   background: white;
 }
 .btn-secondary:hover { background: #f8fafc; }
 
+/* Links */
 .link {
   @apply text-sm text-slate-700 hover:text-slate-900 underline-offset-4 hover:underline;
 }

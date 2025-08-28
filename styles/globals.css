@@ -1,0 +1,52 @@
+/* styles/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme tokens */
+:root {
+  --bg: 0 0% 98%;              /* warm gray background via Tailwind hsl() */
+  --fg: 222 47% 11%;           /* slate-900 */
+  --muted: 215 16% 47%;        /* slate-500 */
+  --border: 214 32% 91%;       /* slate-200 */
+  --card: 0 0% 100%;
+  --navy: 214 60% 22%;         /* subtle navy for hero */
+  --navy-soft: 214 65% 96%;
+}
+
+html, body {
+  background: hsl(var(--bg));
+  color: hsl(var(--fg));
+}
+
+/* Layout helpers */
+.container { @apply max-w-6xl mx-auto px-4; }
+.page-wrap { @apply container py-10; }
+.section-title { @apply text-2xl md:text-3xl font-semibold mb-2; }
+.section-subtle { @apply text-sm text-slate-600; }
+.card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 1rem; /* 2xl feel */
+  box-shadow: 0 1px 1px rgba(0,0,0,.02);
+}
+
+/* Buttons & links */
+.btn-primary {
+  @apply inline-flex items-center rounded-xl px-3 py-2 text-sm font-medium;
+  background: hsl(var(--navy));
+  color: white;
+}
+.btn-primary:hover { filter: brightness(1.05); }
+
+.btn-secondary {
+  @apply inline-flex items-center rounded-xl px-3 py-2 text-sm font-medium border;
+  border-color: hsl(var(--border));
+  color: hsl(var(--fg));
+  background: white;
+}
+.btn-secondary:hover { background: #f8fafc; }
+
+.link {
+  @apply text-sm text-slate-700 hover:text-slate-900 underline-offset-4 hover:underline;
+}

@@ -4,77 +4,57 @@ import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-/**
- * Stable ID helper: create a readable deterministic id for vehicles so
- * re-running seeds won't duplicate rows.
- */
-function vehicleIdSlug(v: {
-  make: string;
-  model: string;
-  year: number;
-  locationCity: string;
-}) {
-  return `${v.make}-${v.model}-${v.year}-${v.locationCity}`
-    .toLowerCase()
-    .replace(/\s+/g, "-");
+function vehicleIdSlug(v: { make: string; model: string; year: number; locationCity: string }) {
+  return `${v.make}-${v.model}-${v.year}-${v.locationCity}`.toLowerCase().replace(/\s+/g, "-");
 }
 
 async function main() {
   console.log("🌱 Seeding GoSwap…");
 
-  // Admin credentials (override in Vercel env if you want stronger defaults)
+  // Seed credentials (override via env if you want)
   const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || "admin@goswap.ke";
   const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || "ChangeMeNow!123";
 
-  // Demo users
   const PARTNER_EMAIL = process.env.SEED_PARTNER_EMAIL || "partner@goswap.ke";
-  const PARTNER_PASSWORD =
-    process.env.SEED_PARTNER_PASSWORD || "PartnerPass!123";
+  const PARTNER_PASSWORD = process.env.SEED_PARTNER_PASSWORD || "PartnerPass!123";
 
-  const TRAVELLER_EMAIL =
-    process.env.SEED_TRAVELLER_EMAIL || "traveller@goswap.ke";
-  const TRAVELLER_PASSWORD =
-    process.env.SEED_TRAVELLER_PASSWORD || "TravellerPass!123";
+  const TRAVELLER_EMAIL = process.env.SEED_TRAVELLER_EMAIL || "traveller@goswap.ke";
+  const TRAVELLER_PASSWORD = process.env.SEED_TRAVELLER_PASSWORD || "TravellerPass!123";
 
-  // 1) Admin user
+  // 1) Admin
   const adminPasswordHash = await hash(ADMIN_PASSWORD, 10);
   const admin = await prisma.user.upsert({
     where: { email: ADMIN_EMAIL },
-    update: {
-      role: Role.ADMIN,
-    },
+    update: { role: Role.ADMIN },
     create: {
       email: ADMIN_EMAIL,
       password: adminPasswordHash,
       name: "GoSwap Admin",
-      role: Role.ADMIN,
+      role: Role.ADMIN, // ✅ enum, not "admin"
     },
   });
   console.log("✔️ Admin:", admin.email);
 
-  // 2) Partner user + PartnerProfile (private payout config)
+  // 2) Partner + profile
   const partnerPasswordHash = await hash(PARTNER_PASSWORD, 10);
   const partner = await prisma.user.upsert({
     where: { email: PARTNER_EMAIL },
-    update: {
-      role: Role.PARTNER,
-    },
+    update: { role: Role.PARTNER },
     create: {
       email: PARTNER_EMAIL,
       password: partnerPasswordHash,
       name: "Seed Partner",
-      role: Role.PARTNER,
+      role: Role.PARTNER, // ✅
     },
   });
 
-  // Ensure PartnerProfile exists/updated
   await prisma.partnerProfile.upsert({
     where: { userId: partner.id },
     update: {
       businessName: "Seed Partner Ltd",
       payoutMethod: "M-PESA",
       mpesaNumber: "0700000000",
-      commissionPct: new Prisma.Decimal("0.12"), // 12%
+      commissionPct: new Prisma.Decimal("0.12"),
       status: "APPROVED",
     },
     create: {
@@ -88,23 +68,21 @@ async function main() {
   });
   console.log("✔️ Partner:", partner.email);
 
-  // 3) Traveller user
+  // 3) Traveller
   const travellerPasswordHash = await hash(TRAVELLER_PASSWORD, 10);
   const traveller = await prisma.user.upsert({
     where: { email: TRAVELLER_EMAIL },
-    update: {
-      role: Role.TRAVELLER,
-    },
+    update: { role: Role.TRAVELLER },
     create: {
       email: TRAVELLER_EMAIL,
       password: travellerPasswordHash,
       name: "Seed Traveller",
-      role: Role.TRAVELLER,
+      role: Role.TRAVELLER, // ✅
     },
   });
   console.log("✔️ Traveller:", traveller.email);
 
-  // 4) Vehicles for the partner (APPROVED)
+  // 4) Vehicles (APPROVED)
   const vehicles = [
     {
       listingType: ListingType.SWAP,
@@ -174,13 +152,7 @@ async function main() {
   ] as const;
 
   for (const v of vehicles) {
-    const id = vehicleIdSlug({
-      make: v.make,
-      model: v.model,
-      year: v.year,
-      locationCity: v.locationCity,
-    });
-
+    const id = vehicleIdSlug({ make: v.make, model: v.model, year: v.year, locationCity: v.locationCity });
     await prisma.vehicle.upsert({
       where: { id },
       update: {
@@ -197,7 +169,7 @@ async function main() {
         status: v.status,
       },
       create: {
-        id, // stable id so re-seeding won't duplicate
+        id,
         partnerId: partner.id,
         listingType: v.listingType,
         make: v.make,
@@ -212,7 +184,6 @@ async function main() {
       },
     });
   }
-  console.log(`✔️ Vehicles: ${vehicles.length} seeded/updated`);
 
   console.log("✅ Seeding complete.");
 }

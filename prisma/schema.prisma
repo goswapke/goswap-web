@@ -8,32 +8,59 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum Role {
+  TRAVELLER
+  PARTNER
+  ADMIN
+}
+
 enum ListingType {
-  LEASE
   SWAP
+  LEASE
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
-  role      String   @default("traveler")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String          @id @default(cuid())
+  email          String          @unique
+  password       String
+  name           String?
+  phone          String?
+  role           Role            @default(TRAVELLER)
+  createdAt      DateTime        @default(now())
+  partnerProfile PartnerProfile?
+  vehicles       Vehicle[]       @relation("OwnerVehicles")
+}
+
+model PartnerProfile {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id])
+  businessName       String?
+  // Payout config (PRIVATE)
+  payoutMethod       String    @default("M-PESA") // or BANK
+  mpesaNumber        String?
+  bankAccountName    String?
+  bankAccountNumber  String?
+  bankName           String?
+  bankBranch         String?
+  commissionPct      Decimal   @default(0.12)
+  status             String    @default("PENDING") // PENDING|APPROVED|SUSPENDED
+  createdAt          DateTime  @default(now())
 }
 
 model Vehicle {
-  id            String      @id @default(cuid())
+  id            String       @id @default(cuid())
+  partnerId     String?
+  partner       User?        @relation("OwnerVehicles", fields: [partnerId], references: [id])
+  listingType   ListingType
   make          String
   model         String
   year          Int
+  locationCity  String
+  description   String?
+  imageUrl      String?
   fuelType      String?
   transmission  String?
-  locationCity  String
-  imageUrl      String?
-  listingType   ListingType @default(SWAP)
-  description   String?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  status        String       @default("PENDING") // PENDING|APPROVED|HIDDEN
+  createdAt     DateTime     @default(now())
 }

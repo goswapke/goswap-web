@@ -12,7 +12,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="min-h-dvh bg-[hsl(var(--background))] text-[hsl(var(--foreground))] antialiased">
-        {/* Light header with subtle blur and border */}
         <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-b border-[hsl(var(--border))]">
           <div className="page-wrap py-3">
             <div className="flex items-center justify-between">

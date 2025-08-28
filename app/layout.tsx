@@ -1,44 +1,70 @@
 // app/layout.tsx
+import "./../styles/globals.css";
 import type { Metadata } from "next";
-import Image from "next/image";
-import "./globals.css";
-import SocialIcons from "@/components/SocialIcons";
 
 export const metadata: Metadata = {
   title: "GoSwap",
-  description: "Drive your way at your destination.",
+  description: "Swap or lease vehicles with trusted partners.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+function CommitBanner() {
+  // Shows last commit (works on Vercel)
+  const sha = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || "local";
+  const branch = process.env.VERCEL_GIT_COMMIT_REF || "dev";
   return (
-    <html lang="en">
-      <body className="min-h-dvh bg-[hsl(var(--background))] text-[hsl(var(--foreground))] antialiased">
-        {/* Light header with subtle blur and border */}
-        <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-b border-[hsl(var(--border))]">
-          <div className="page-wrap py-3">
-            <div className="flex items-center justify-between">
-              <a href="/" className="flex items-center gap-2">
-                <Image src="/logo.svg" alt="GoSwap" width={24} height={24} />
-                <span className="font-semibold tracking-tight">GoSwap</span>
+    <div style={{
+      background: "hsl(214, 60%, 22%)",
+      color: "white",
+      padding: "6px 12px",
+      fontSize: 12,
+      textAlign: "center"
+    }}>
+      Deployed • {branch}@{sha}
+    </div>
+  );
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" className="min-h-full bg-warm-gray-50 text-slate-900">
+      <body className="min-h-screen flex flex-col">
+        <CommitBanner />
+        <header className="sticky top-0 z-30 backdrop-blur bg-white/80 border-b border-[--border]">
+          <div className="container">
+            <div className="flex items-center justify-between py-3">
+              <a href="/" className="font-semibold tracking-tight text-slate-900">
+                GoSwap
               </a>
-              <nav className="hidden sm:flex items-center gap-4">
-                <a href="/" className="text-sm text-gray-700 hover:text-black">Home</a>
-                <a href="/swap" className="text-sm text-gray-700 hover:text-black">Swap</a>
-                <a href="/lease" className="text-sm text-gray-700 hover:text-black">Lease</a>
+              <nav className="flex items-center gap-4 text-sm">
+                <a href="/swap" className="link">Swap</a>
+                <a href="/lease" className="link">Lease</a>
+                <a href="/auth/sign-in" className="btn-secondary">Sign in</a>
+                <a href="/auth/sign-up" className="btn-primary">Create account</a>
               </nav>
             </div>
           </div>
         </header>
 
-        <main>{children}</main>
+        <main className="flex-1">{children}</main>
 
-        <footer className="mt-16 border-t border-[hsl(var(--border))] bg-white/50">
-          <div className="page-wrap py-8 text-sm text-gray-600 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>© {new Date().getFullYear()} GoSwap — Drive your way at your destination.</div>
-            <SocialIcons />
+        <footer className="border-t border-[--border] bg-white">
+          <div className="container py-10 text-sm text-slate-600">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-3">
+              <p>© {new Date().getFullYear()} GoSwap. All rights reserved.</p>
+              <div className="flex items-center gap-4">
+                <a className="link" href="https://facebook.com" target="_blank" rel="noreferrer">Facebook</a>
+                <a className="link" href="https://instagram.com" target="_blank" rel="noreferrer">Instagram</a>
+                <a className="link" href="https://wa.me/254700000000" target="_blank" rel="noreferrer">WhatsApp</a>
+              </div>
+            </div>
           </div>
         </footer>
       </body>
     </html>
   );
 }
+

@@ -2,13 +2,17 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function SignUpPage() {
-  const [name, setName] = useState("");
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [err, setErr] = useState<string | null>(null);
+  const [name, setName] = useState("");
+  const [role, setRole] = useState<"TRAVELLER" | "PARTNER" | "ADMIN">("TRAVELLER"); // keep for now
   const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -17,14 +21,19 @@ export default function SignUpPage() {
     try {
       const res = await fetch("/api/auth/sign-up", {
         method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, name, role }),
       });
       const json = await res.json();
-      if (!res.ok || !json.ok) throw new Error(json.error || "Sign-up failed");
-      window.location.assign(json.redirect || "/app");
+
+      if (!res.ok || !json.ok) {
+        setErr(json?.error || "Sign-up failed");
+      } else {
+        // API returns { redirect: "/app" | "/partner" | "/admin" }
+        router.push(json.redirect || "/app");
+      }
     } catch (e: any) {
-      setErr(e?.message || "Sign-up failed");
+      setErr(e?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -32,55 +41,76 @@ export default function SignUpPage() {
 
   return (
     <main className="page-wrap">
-      <h1 className="section-title">Create account</h1>
-      <p className="section-subtle">Join GoSwap to book, swap, or manage vehicles.</p>
-
-      <form onSubmit={onSubmit} className="card p-6 mt-6 grid gap-4 max-w-md">
-        {err && <div className="text-red-600 text-sm">{err}</div>}
-        <label className="grid gap-1 text-sm">
-          <span>Name</span>
-          <input
-            className="border rounded-xl px-3 py-2"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Your name"
-          />
-        </label>
-
-        <label className="grid gap-1 text-sm">
-          <span>Email</span>
-          <input
-            className="border rounded-xl px-3 py-2"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-          />
-        </label>
-
-        <label className="grid gap-1 text-sm">
-          <span>Password</span>
-          <input
-            className="border rounded-xl px-3 py-2"
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="At least 6 characters"
-          />
-        </label>
-
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? "Creating…" : "Create account"}
-        </button>
-
-        <div className="text-sm text-slate-600">
+      <section className="max-w-md mx-auto card p-6 md:p-8">
+        <h1 className="text-2xl font-semibold mb-1">Create an account</h1>
+        <p className="text-sm text-gray-600 mb-6">
           Already have an account?{" "}
-          <a className="link" href="/auth/sign-in">Sign in</a>
+          <Link className="link" href="/auth/sign-in">Sign in</Link>
+        </p>
+
+        {err && <div className="mb-4 text-sm text-red-600">{err}</div>}
+
+        <form onSubmit={onSubmit} className="grid gap-4">
+          <label className="grid gap-1 text-sm">
+            <span>Email</span>
+            <input
+              type="email"
+              required
+              className="input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+            />
+          </label>
+
+          <label className="grid gap-1 text-sm">
+            <span>Password</span>
+            <input
+              type="password"
+              required
+              minLength={6}
+              className="input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="At least 6 characters"
+            />
+          </label>
+
+          <label className="grid gap-1 text-sm">
+            <span>Name (optional)</span>
+            <input
+              type="text"
+              className="input"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
+            />
+          </label>
+
+          {/* Keep role selector visible for now so we can test all portals easily. 
+              We can hide this later and default to TRAVELLER. */}
+          <label className="grid gap-1 text-sm">
+            <span>Role (for testing)</span>
+            <select
+              className="input"
+              value={role}
+              onChange={(e) => setRole(e.target.value as any)}
+            >
+              <option value="TRAVELLER">Traveller</option>
+              <option value="PARTNER">Partner</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          </label>
+
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? "Creating..." : "Create account"}
+          </button>
+        </form>
+
+        <div className="mt-6 text-xs text-gray-500">
+          By creating an account, you agree to our terms and privacy policy.
         </div>
-      </form>
+      </section>
     </main>
   );
 }

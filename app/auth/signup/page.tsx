@@ -1,18 +1,17 @@
 // app/auth/sign-up/page.tsx
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const [role, setRole] = useState<"TRAVELLER" | "PARTNER">("TRAVELLER");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [role, setRole] = useState<"TRAVELLER" | "PARTNER" | "ADMIN">("TRAVELLER"); // keep for now
-  const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -22,16 +21,11 @@ export default function SignUpPage() {
       const res = await fetch("/api/auth/sign-up", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name, role }),
+        body: JSON.stringify({ email, password, role }),
       });
       const json = await res.json();
-
-      if (!res.ok || !json.ok) {
-        setErr(json?.error || "Sign-up failed");
-      } else {
-        // API returns { redirect: "/app" | "/partner" | "/admin" }
-        router.push(json.redirect || "/app");
-      }
+      if (!res.ok || !json.ok) throw new Error(json.error || "Sign up failed");
+      router.push(json.redirect || "/app");
     } catch (e: any) {
       setErr(e?.message || "Something went wrong");
     } finally {
@@ -42,10 +36,10 @@ export default function SignUpPage() {
   return (
     <main className="page-wrap">
       <section className="max-w-md mx-auto card p-6 md:p-8">
-        <h1 className="text-2xl font-semibold mb-1">Create an account</h1>
+        <h1 className="text-2xl font-semibold mb-1">Create your account</h1>
         <p className="text-sm text-gray-600 mb-6">
           Already have an account?{" "}
-          <Link className="link" href="/auth/sign-in">Sign in</Link>
+          <Link className="link" href="/auth/signin">Sign in</Link>
         </p>
 
         {err && <div className="mb-4 text-sm text-red-600">{err}</div>}
@@ -77,20 +71,7 @@ export default function SignUpPage() {
           </label>
 
           <label className="grid gap-1 text-sm">
-            <span>Name (optional)</span>
-            <input
-              type="text"
-              className="input"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-            />
-          </label>
-
-          {/* Keep role selector visible for now so we can test all portals easily. 
-              We can hide this later and default to TRAVELLER. */}
-          <label className="grid gap-1 text-sm">
-            <span>Role (for testing)</span>
+            <span>Account type</span>
             <select
               className="input"
               value={role}
@@ -98,7 +79,6 @@ export default function SignUpPage() {
             >
               <option value="TRAVELLER">Traveller</option>
               <option value="PARTNER">Partner</option>
-              <option value="ADMIN">Admin</option>
             </select>
           </label>
 
@@ -106,10 +86,6 @@ export default function SignUpPage() {
             {loading ? "Creating..." : "Create account"}
           </button>
         </form>
-
-        <div className="mt-6 text-xs text-gray-500">
-          By creating an account, you agree to our terms and privacy policy.
-        </div>
       </section>
     </main>
   );

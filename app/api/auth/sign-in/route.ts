@@ -7,22 +7,30 @@ import { compare } from "bcryptjs";
 import { createSession, portalFor } from "@/lib/auth";
 import { z } from "zod";
 
-const schema = z.object({
+const SignInSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(6),
+  password: z.string().min(1, "Password is required"),
 });
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const parsed = schema.safeParse(body);
+    const json = await req.json().catch(() => ({}));
+    const parsed = SignInSchema.safeParse(json);
     if (!parsed.success) {
-      return NextResponse.json({ ok: false, error: "Invalid input" }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: parsed.error.errors.map(e => e.message).join(", ") },
+        { status: 400 }
+      );
     }
+
     const { email, password } = parsed.data;
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || !user.password) {
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true, email: true, password: true, role: true },
+    });
+
+    if (!user) {
       return NextResponse.json({ ok: false, error: "Invalid credentials" }, { status: 401 });
     }
 
@@ -31,11 +39,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Invalid credentials" }, { status: 401 });
     }
 
-    await createSession({ userId: user.id, email: user.email, role: user.role as any });
-    const redirect = portalFor(user.role);
+    // IMPORTANT: use userId, not sub
+    await createSession({ userId: user.id, email: user.email, role: user.role });
 
-    return NextResponse.json({ ok: true, redirect });
-  } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e?.message || "Sign-in failed" }, { status: 500 });
+    return NextResponse.json({ ok: true, redirect: portalFor(user.role) });
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: "Sign-in failed. Please try again." },
+      { status: 500 }
+    );
   }
 }

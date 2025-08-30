@@ -5,28 +5,57 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { hash } from "bcryptjs";
 import { createSession, portalFor } from "@/lib/auth";
+import { Role } from "@prisma/client";
+import { z } from "zod";
+
+const SignUpSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  name: z.string().optional(),
+  // Allow selecting a role during testing; default to TRAVELLER
+  role: z.enum(["TRAVELLER", "PARTNER", "ADMIN"]).optional(),
+});
 
 export async function POST(req: Request) {
   try {
-    const { email, password, name } = await req.json();
-    if (!email || !password) return NextResponse.json({ ok: false, error: "Email & password required" }, { status: 400 });
+    const json = await req.json().catch(() => ({}));
+    const parsed = SignUpSchema.safeParse(json);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { ok: false, error: parsed.error.errors.map(e => e.message).join(", ") },
+        { status: 400 }
+      );
+    }
+
+    const { email, password, name, role } = parsed.data;
+    const passwordHash = await hash(password, 10);
+    const roleValue: Role = (role as Role) ?? "TRAVELLER";
 
     const user = await prisma.user.create({
       data: {
-        email: String(email).toLowerCase().trim(),
-        password: await hash(password, 10),
-        name: name ? String(name) : undefined,
-        role: "TRAVELLER", // default
+        email,
+        password: passwordHash,
+        name: name ?? null,
+        role: roleValue,
       },
       select: { id: true, email: true, role: true },
     });
 
-    await createSession({ sub: user.id, email: user.email, role: user.role as any });
-    return NextResponse.json({ ok: true, redirect: portalFor(user.role as any) });
+    // IMPORTANT: use userId, not sub
+    await createSession({ userId: user.id, email: user.email, role: user.role });
+
+    return NextResponse.json({ ok: true, redirect: portalFor(user.role) });
   } catch (e: any) {
-    if (String(e?.message || "").includes("Unique constraint")) {
-      return NextResponse.json({ ok: false, error: "Email already registered" }, { status: 409 });
+    const msg = String(e?.message || "");
+    if (msg.includes("Unique constraint") || msg.toLowerCase().includes("unique")) {
+      return NextResponse.json(
+        { ok: false, error: "That email is already registered." },
+        { status: 409 }
+      );
     }
-    return NextResponse.json({ ok: false, error: "Sign-up failed" }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: "Sign-up failed. Please try again." },
+      { status: 500 }
+    );
   }
 }

@@ -6,7 +6,12 @@ const AUTH_ROUTES = [/^\/app(\/|$)/, /^\/partner(\/|$)/, /^\/admin(\/|$)/];
 
 function getSecret() {
   const secret = process.env.AUTH_SECRET;
-  return new TextEncoder().encode(secret!);
+  if (!secret) {
+    // Dev-friendly fallback so you can test locally without crashing.
+    if (process.env.NODE_ENV !== "production") return new TextEncoder().encode("dev-secret");
+    throw new Error("AUTH_SECRET missing");
+  }
+  return new TextEncoder().encode(secret);
 }
 
 export async function middleware(req: NextRequest) {
@@ -23,14 +28,19 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Verify & route-gate
   try {
     const { payload } = await jwtVerify(token, getSecret());
     const role = String(payload.role || "");
 
-    if (pathname.startsWith("/admin") && role !== "ADMIN") return NextResponse.redirect(new URL("/auth/sign-in", req.url));
-    if (pathname.startsWith("/partner") && role !== "PARTNER" && role !== "ADMIN") return NextResponse.redirect(new URL("/auth/sign-in", req.url));
-    if (pathname.startsWith("/app") && role !== "TRAVELLER" && role !== "ADMIN") return NextResponse.redirect(new URL("/auth/sign-in", req.url));
+    if (pathname.startsWith("/admin") && role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/auth/sign-in", req.url));
+    }
+    if (pathname.startsWith("/partner") && role !== "PARTNER" && role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/auth/sign-in", req.url));
+    }
+    if (pathname.startsWith("/app") && role !== "TRAVELLER" && role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/auth/sign-in", req.url));
+    }
 
     return NextResponse.next();
   } catch {
